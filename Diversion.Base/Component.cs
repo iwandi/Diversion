@@ -14,7 +14,7 @@ namespace Diversion.Base
         public bool Enabled 
         { 
             get { return enabled; }
-            virtual set { enabled = value; }
+            set { enabled = value; }
         }
 
         // Time to Bind to other Component

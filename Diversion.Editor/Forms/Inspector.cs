@@ -1,17 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
 using System.Drawing;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 
 namespace Diversion.Editor
 {
-    public partial class Form1 : Form
+    public partial class Inspector : UserControl
     {
-        public Form1()
+        public Inspector()
         {
             InitializeComponent();
         }

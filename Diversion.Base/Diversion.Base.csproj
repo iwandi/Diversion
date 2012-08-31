@@ -42,10 +42,18 @@
   <ItemGroup>
     <Compile Include="Component.cs" />
     <Compile Include="GameObject.cs" />
+    <Compile Include="Math\Matrix4.cs" />
     <Compile Include="Math\Quaternion.cs" />
     <Compile Include="Math\Vector3.cs" />
+    <Compile Include="Rendering\IRenderer.cs" />
+    <Compile Include="Rendering\MeshInstance.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Transform.cs" />
+    <Compile Include="Rendering\MeshRenderer.cs" />
+    <Compile Include="Rendering\RenderManager.cs" />
+    <Compile Include="RequireComponentAttribute.cs" />
+    <Compile Include="Scene\Camera.cs" />
+    <Compile Include="Scene\Light.cs" />
+    <Compile Include="Scene\Transform.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

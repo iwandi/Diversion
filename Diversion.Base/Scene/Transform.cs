@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Diversion.Base
 {
-    public sealed class Transform : Component
+    public class Transform : Component
     {
         protected Transform root;
         public Transform Root { get { return root; } }

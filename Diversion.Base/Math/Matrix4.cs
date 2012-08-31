@@ -3,10 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Diversion.Base
+namespace Diversion.Base.Math
 {
-    public struct Vector3
+    public struct Matrix4
     {
-        
     }
 }

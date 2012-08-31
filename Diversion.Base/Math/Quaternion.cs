@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Diversion.Base
 {
-    public class Quaternion
+    public struct Quaternion
     {
     }
 }

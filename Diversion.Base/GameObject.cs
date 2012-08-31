@@ -7,12 +7,15 @@ namespace Diversion.Base
 {
     // hirachie onely with transforms ???
     // not multi thread save interation of components
+    [Serializable]
     public class GameObject
     {
         // do some V8 magic to better lookup components by type
         IList<Component> components = new List<Component>();
 
+        [NonSerialized]
         bool m_bound = false;
+        [NonSerialized]
         bool m_started = false;
 
         Component InternalAddComponent(Type type)

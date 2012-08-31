@@ -5,8 +5,9 @@ using System.Text;
 
 namespace Diversion.Base
 {
-    public struct Vector3
+    [RequireComponent(typeof(Transform))]
+    public class Camera : Component
     {
-        
+
     }
 }
