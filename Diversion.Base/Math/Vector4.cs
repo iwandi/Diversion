@@ -4,18 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Runtime.Serialization;
 
-namespace Diversion.Base
+namespace Diversion.Base.Math
 {
     [DataContract]
-    public struct Vector3
+    public struct Vector4
     {
-        public readonly static Vector3 Forward = new Vector3(1f,0f,0f);
-        public readonly static Vector3 Backward = new Vector3(-1f, 0f, 0f);
-        public readonly static Vector3 Right = new Vector3(1f, 0f, 0f);
-        public readonly static Vector3 Left = new Vector3(-1f, 0f, 0f);
-        public readonly static Vector3 Up = new Vector3(0f, 0f, 1f);
-        public readonly static Vector3 Down = new Vector3(0f, 0f, -1f);
-
         [DataMember(Order=0)]
         float x;
         public float X
@@ -40,11 +33,12 @@ namespace Diversion.Base
             set { z = value; }
         }
 
-        public Vector3(float x, float y, float z)
+        [DataMember(Order=3)]
+        float w;
+        public float W
         {
-            this.x = x;
-            this.y = y;
-            this.z = z;
+            get { return w; }
+            set { w = value; }
         }
     }
 }

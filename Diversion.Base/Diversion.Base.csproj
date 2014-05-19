@@ -33,6 +33,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -41,10 +42,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Component.cs" />
+    <Compile Include="ComponentStorrage.cs" />
     <Compile Include="GameObject.cs" />
+    <Compile Include="GameObjectLayout.cs" />
     <Compile Include="Math\Matrix4.cs" />
     <Compile Include="Math\Quaternion.cs" />
+    <Compile Include="Math\Vector2.cs" />
     <Compile Include="Math\Vector3.cs" />
+    <Compile Include="Math\Vector4.cs" />
     <Compile Include="Rendering\IRenderer.cs" />
     <Compile Include="Rendering\MeshInstance.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -2,19 +2,28 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Runtime.Serialization;
 
 namespace Diversion.Base
 {
+    [DataContract]
     public abstract class Component
     {
+        [DataMember(Order=0)]
         internal protected GameObject gameObject;
         public GameObject GameObject { get { return gameObject; } }
 
-        protected bool enabled;
         public bool Enabled 
         { 
-            get { return enabled; }
-            set { enabled = value; }
+            get { return enabledLocal && gameObject.Enabled; }
+        }
+
+        [DataMember(Order=1)]
+        bool enabledLocal;
+        public bool EnabledLocal
+        {
+            get { return enabledLocal; }
+            set { enabledLocal = value; }
         }
 
         // Time to Bind to other Component

@@ -2,20 +2,37 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Runtime.Serialization;
 
 namespace Diversion.Base
 {
     // hirachie onely with transforms ???
     // not multi thread save interation of components
-    [Serializable]
+    [DataContract]
     public class GameObject
     {
-        // do some V8 magic to better lookup components by type
+        GameObjectLayout layout = GameObjectLayout.EmptyObjectLayout;
+
+        [DataMember(Order=0)]
+        string name;
+        public string Name
+        {
+            get { return name; }
+            set { name = value; }
+        }
+
+        [DataMember(Order=1)]
+        bool enabled;
+        public bool Enabled
+        {
+            get { return enabled; }
+            set { enabled = value; }
+        }
+
+        [DataMember(Order=2)]
         IList<Component> components = new List<Component>();
 
-        [NonSerialized]
         bool m_bound = false;
-        [NonSerialized]
         bool m_started = false;
 
         Component InternalAddComponent(Type type)
@@ -170,10 +187,24 @@ namespace Diversion.Base
         {
             for (int i = 0; i < components.Count; i++)
             {
-                components[i].Enabled = active;
+                components[i].EnabledLocal = active;
             }
 
             // TODO find a way to get child objects and call set acive
+        }
+
+        public void SendMessage(string msg, MessageScope scope,  params object[] args)
+        {
+            throw new NotImplementedException();
+        }
+
+        [Flags]
+        public enum MessageScope : byte
+        {
+            None = 0,
+            Local = 1,
+            Children = 2,
+            Parents = 4
         }
     }
 }
