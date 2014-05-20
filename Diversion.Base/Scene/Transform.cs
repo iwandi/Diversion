@@ -8,7 +8,7 @@ namespace Diversion.Base
 {
     public class Transform : Component
     {
-        [DataMember(Order=2)]
+        [DataMember(Order = 2)]
         bool isStatic;
         public bool IsStatic
         {
@@ -20,9 +20,9 @@ namespace Diversion.Base
         Transform root;
         public Transform Root { get { return root; } }
 
-        [DataMember(Order = 4)]
+        /*[DataMember(Order = 4)]
         Transform parent;
-        public Transform Parent { get { return parent; } }
+        public Transform Parent { get { return parent; } }*/
 
 
         [DataMember(Order = 5)]

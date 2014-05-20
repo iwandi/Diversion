@@ -9,7 +9,7 @@ namespace Diversion.Base
     [DataContract]
     public abstract class Component
     {
-        [DataMember(Order=0)]
+        [DataMember(Order = 0)]
         internal protected GameObject gameObject;
         public GameObject GameObject { get { return gameObject; } }
 
@@ -18,7 +18,7 @@ namespace Diversion.Base
             get { return enabledLocal && gameObject.Enabled; }
         }
 
-        [DataMember(Order=1)]
+        [DataMember(Order = 1)]
         bool enabledLocal;
         public bool EnabledLocal
         {

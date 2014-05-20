@@ -1,24 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
 using System.Drawing;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 
 namespace Diversion.Editor
 {
-    public partial class Editor : Form
+    public partial class InspectorControl : UserControl
     {
-        public Editor()
+        public InspectorControl()
         {
             InitializeComponent();
         }
 
-        private void hirachieView_SelectionChanged(Base.GameObject obj)
+        public virtual void SetTarget(object target,Inspector host)
         {
-            inspector.SelectedObject = obj;
+
         }
     }
 }

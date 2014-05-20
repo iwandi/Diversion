@@ -64,10 +64,25 @@
     <Compile Include="Forms\Inspector.Designer.cs">
       <DependentUpon>Inspector.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\InspectorControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Forms\InspectorControl.Designer.cs">
+      <DependentUpon>InspectorControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\GameObjectInspector.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Forms\GameObjectInspector.Designer.cs">
+      <DependentUpon>GameObjectInspector.cs</DependentUpon>
+    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Forms\Editor.resx">
       <DependentUpon>Editor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\GameObjectInspector.resx">
+      <DependentUpon>GameObjectInspector.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\HirachieView.resx">
       <DependentUpon>HirachieView.cs</DependentUpon>
@@ -93,6 +108,12 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Diversion.Base\Diversion.Base.csproj">
+      <Project>{B18A2DE0-2060-41DC-A9B8-0AE69EC558BD}</Project>
+      <Name>Diversion.Base</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

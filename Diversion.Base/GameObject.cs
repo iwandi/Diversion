@@ -6,22 +6,28 @@ using System.Runtime.Serialization;
 
 namespace Diversion.Base
 {
-    // hirachie onely with transforms ???
+    public delegate void GameObjectParamDelgate(GameObject obj);
+    public delegate GameObject GameObjectResaultDelegate();
+
     // not multi thread save interation of components
     [DataContract]
     public class GameObject
     {
-        GameObjectLayout layout = GameObjectLayout.EmptyObjectLayout;
+        public static bool SendMassageEnabled = true;
 
-        [DataMember(Order=0)]
-        string name;
+        GameObjectLayout layout = GameObjectLayout.EmptyObjectLayout;
+        [DataMember(Order = 2)]
+        ComponentStorrage storrage = new ComponentStorrage();
+
+        [DataMember(Order = 0)]
+        string name = "New GameObject";
         public string Name
         {
             get { return name; }
             set { name = value; }
         }
 
-        [DataMember(Order=1)]
+        [DataMember(Order = 1)]
         bool enabled;
         public bool Enabled
         {
@@ -29,17 +35,53 @@ namespace Diversion.Base
             set { enabled = value; }
         }
 
-        [DataMember(Order=2)]
-        IList<Component> components = new List<Component>();
-
         bool m_bound = false;
         bool m_started = false;
 
+        GameObject parent;
+        public GameObject Parent
+        {
+            get { return parent; }
+            set 
+            { 
+                // TODO : add some child lost event ?
+                if (parent != null)
+                {
+                    parent.children.Remove(this);
+                }
+                parent = value;
+                if (parent != null)
+                {
+                    parent.children.Add(this);
+                }
+                // TODO : notifiy parents
+                SendMessage("OnParentChanged", GameObjectMessageScope.Local);
+                // TODO : send some Into to Children ?
+            }
+        }
+
+        // PERF : recusive
+        public GameObject Root
+        {
+            get
+            {
+                if (parent == null)
+                {
+                    return this;
+                }
+                return parent.Parent;
+            }
+        }
+
+        List<GameObject> children = new List<GameObject>();
+        public System.Collections.ObjectModel.ReadOnlyCollection<GameObject> Children { get { return children.AsReadOnly(); } }
+
         Component InternalAddComponent(Type type)
         {
-            Component comp = Activator.CreateInstance(type) as Component;
+            Component comp;
+            layout = layout.AddComponent(type, storrage, out comp);
             comp.gameObject = this;
-            components.Add(comp);
+            
             if (m_bound)
             {
                 comp.Bind();
@@ -68,14 +110,7 @@ namespace Diversion.Base
 
         Component InternalGetComponent(Type type)
         {
-            for (int i = 0; i < components.Count; i++)
-            {
-                Component comp = components[i];
-                if (comp.GetType().IsAssignableFrom(type))
-                {
-                    return comp;
-                }
-            }
+            return layout.GetComponent(type, storrage);
             throw new KeyNotFoundException();
         }
         
@@ -94,117 +129,165 @@ namespace Diversion.Base
             return InternalGetComponent(typeof(T)) as T;
         }
 
-        IEnumerator<Component> InternalGetComponents(Type type)
+        IEnumerator<Component> InternalListComponent(Type type)
         {
-            for (int i = 0; i < components.Count; i++)
-            {
-                Component comp = components[i];
-                if (comp.GetType().IsAssignableFrom(type))
-                {
-                    yield return comp;
-                }
-            }
+            return layout.ListComponent(type, storrage);
         }
 
-        public IEnumerator<Component> GetComponents(Type type)
+        public IEnumerator<Component> ListComponent(Type type)
         {
             if (!type.IsAssignableFrom(typeof(Component)))
             {
                 throw new Exception("Cant get Component type that is not based on Component");
             }
 
-            return InternalGetComponents(type);
+            return InternalListComponent(type);
         }
 
-        public IEnumerator<T> GetComponents<T>() where T : Component
+        public IEnumerator<T> ListComponent<T>() where T : Component
         {
-            return InternalGetComponents(typeof(T)) as IEnumerator<T>;
+            return InternalListComponent(typeof(T)) as IEnumerator<T>;
         }
-
-        /*public Component GetComponentInChildren(Type type)
-        {
-            throw new NotImplementedException();
-        }
-
-        public T GetComponentInChildren<T>() where T : Component
-        {
-            return GetComponentInChildren(typeof(T)) as T;
-        }
-
-        public IEnumerator<Component> GetComponentsInChildren(Type type)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IEnumerator<T> GetComponentsInChildren<T>() where T : Component
-        {
-            return GetComponentsInChildren(typeof(T)) as IEnumerator<T>;
-        }
-
-        public Component GetComponentInChildrenOfRoot(Type type)
-        {
-            throw new NotImplementedException();
-        }
-
-        public T GetComponentInChildrenOfRoot<T>() where T : Component
-        {
-            return GetComponentInChildrenOfRoot(typeof(T)) as T;
-        }
-
-        public IEnumerator<Component> GetComponentsInChildrenOfRoot(Type type)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IEnumerator<T> GetComponentsInChildrenOfRoot<T>() where T : Component
-        {
-            return GetComponentsInChildrenOfRoot(typeof(T)) as IEnumerator<T>;
-        }*/
 
         public void Bind()
         {
             m_bound = true;
-            for (int i = 0; i < components.Count; i++)
-            {
-                components[i].Bind();
-            }
-
-            // TODO find a way to get child objects and call set acive
+            SendMessage("Bind", GameObjectMessageScope.Local | GameObjectMessageScope.Children);
         }
 
         public void Reset()
         {
             m_started = true;
-            for (int i = 0; i < components.Count; i++)
-            {
-                components[i].Reset();
-            }
-
-            // TODO find a way to get child objects and call set acive
+            SendMessage("Reset", GameObjectMessageScope.Local | GameObjectMessageScope.Children);
         }
 
         public void SetActiveRecursively(bool active)
         {
-            for (int i = 0; i < components.Count; i++)
+            SetProperty<bool>("EnabledLocal", GameObjectMessageScope.Local | GameObjectMessageScope.Children, active);
+        }
+
+        public void SendMessage(string msg, GameObjectMessageScope scope, params object[] args)
+        {
+            InternalSendMessage(msg, scope, args);
+        }
+
+        void InternalSendMessage(string msg, GameObjectMessageScope scope, object[] args)
+        {
+            if (!SendMassageEnabled)
             {
-                components[i].EnabledLocal = active;
+                return;
             }
 
-            // TODO find a way to get child objects and call set acive
+            bool callGloabl = (scope & GameObjectMessageScope.Global) == GameObjectMessageScope.Global;
+            bool callScene = (scope & GameObjectMessageScope.Scene) == GameObjectMessageScope.Scene;
+            if (callGloabl || callScene)
+            {
+                if (callGloabl)
+                {
+                    throw new NotImplementedException();
+                }
+                else if (callScene)
+                {
+                    throw new NotImplementedException();
+                }
+            }
+            else
+            {
+                bool callParents = (scope & GameObjectMessageScope.Parents) == GameObjectMessageScope.Parents;
+
+                if ((scope & GameObjectMessageScope.Root) == GameObjectMessageScope.Root)
+                {
+                    // ignore this if we are going to call all parents anyways
+                    if (!callParents)
+                    {
+                        Root.InternalSendMessage(msg, GameObjectMessageScope.Local, args);
+                    }
+                }
+                if ((scope & GameObjectMessageScope.Local) == GameObjectMessageScope.Local)
+                {
+                    layout.SendMessage(msg, args, storrage);
+                }
+                if (callParents)
+                {
+                    if (parent != null)
+                    {
+                        parent.InternalSendMessage(msg, GameObjectMessageScope.Parents, args);
+                    }
+                }
+                if ((scope & GameObjectMessageScope.Children) == GameObjectMessageScope.Children)
+                {
+                    for (int i = 0; i < children.Count; i++)
+                    {
+                        children[i].InternalSendMessage(msg, GameObjectMessageScope.Children, args);
+                    }
+                }
+            }
         }
 
-        public void SendMessage(string msg, MessageScope scope,  params object[] args)
+        public void SetProperty<T>(string name, GameObjectMessageScope scope, T value)
         {
-            throw new NotImplementedException();
+            if (!SendMassageEnabled)
+            {
+                return;
+            }
+
+            bool callGloabl = (scope & GameObjectMessageScope.Global) == GameObjectMessageScope.Global;
+            bool callScene = (scope & GameObjectMessageScope.Scene) == GameObjectMessageScope.Scene;
+            if (callGloabl || callScene)
+            {
+                if (callGloabl)
+                {
+                    throw new NotImplementedException();
+                }
+                else if (callScene)
+                {
+                    throw new NotImplementedException();
+                }
+            }
+            else
+            {
+                bool callParents = (scope & GameObjectMessageScope.Parents) == GameObjectMessageScope.Parents;
+
+                if ((scope & GameObjectMessageScope.Root) == GameObjectMessageScope.Root)
+                {
+                    // ignore this if we are going to call all parents anyways
+                    if (!callParents)
+                    {
+                        Root.SetProperty<T>(name, GameObjectMessageScope.Local, value);
+                    }
+                }
+                if ((scope & GameObjectMessageScope.Local) == GameObjectMessageScope.Local)
+                {
+                    layout.SetProperty<T>(name, value, storrage);
+                }
+                if (callParents)
+                {
+                    if (parent != null)
+                    {
+                        parent.SetProperty<T>(name, GameObjectMessageScope.Parents, value);
+                    }
+                }
+                if ((scope & GameObjectMessageScope.Children) == GameObjectMessageScope.Children)
+                {
+                    for (int i = 0; i < children.Count; i++)
+                    {
+                        children[i].SetProperty<T>(name, GameObjectMessageScope.Children, value);
+                    }
+                }
+            }
         }
 
-        [Flags]
-        public enum MessageScope : byte
+        public GameObject Clone()
         {
-            None = 0,
-            Local = 1,
-            Children = 2,
-            Parents = 4
+            GameObject clone = new GameObject();
+            clone.layout = layout;
+            clone.storrage = storrage.Clone();
+            clone.name = name + "(Clone)";
+            clone.enabled = enabled;
+
+            // TODO : check bind and reset behavior
+
+            return clone;
         }
     }
 }

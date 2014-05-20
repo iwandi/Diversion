@@ -16,7 +16,7 @@ namespace Diversion.Base
         public readonly static Vector3 Up = new Vector3(0f, 0f, 1f);
         public readonly static Vector3 Down = new Vector3(0f, 0f, -1f);
 
-        [DataMember(Order=0)]
+        [DataMember(Order = 0)]
         float x;
         public float X
         {
@@ -24,7 +24,7 @@ namespace Diversion.Base
             set { x = value; }
         }
 
-        [DataMember(Order=1)]
+        [DataMember(Order = 1)]
         float y;
         public float Y
         {
@@ -32,7 +32,7 @@ namespace Diversion.Base
             set { y = value; }
         }
 
-        [DataMember(Order=2)]
+        [DataMember(Order = 2)]
         float z;
         public float Z
         {

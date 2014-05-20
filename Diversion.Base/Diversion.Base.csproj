@@ -43,8 +43,10 @@
   <ItemGroup>
     <Compile Include="Component.cs" />
     <Compile Include="ComponentStorrage.cs" />
+    <Compile Include="Factory.cs" />
     <Compile Include="GameObject.cs" />
     <Compile Include="GameObjectLayout.cs" />
+    <Compile Include="GameObjectMessageScope.cs" />
     <Compile Include="Math\Matrix4.cs" />
     <Compile Include="Math\Quaternion.cs" />
     <Compile Include="Math\Vector2.cs" />
@@ -58,6 +60,7 @@
     <Compile Include="RequireComponentAttribute.cs" />
     <Compile Include="Scene\Camera.cs" />
     <Compile Include="Scene\Light.cs" />
+    <Compile Include="Scene\Scene.cs" />
     <Compile Include="Scene\Transform.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
